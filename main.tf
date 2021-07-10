@@ -317,3 +317,20 @@ output "east-2-public-ip" {
 }
 
 # sample query on bash $ aws ec2 describe-images --region us-west-1 --filters "Name=name,Values=aws-elasticbeanstalk-amzn-2017.09.1.x86_64-ecs-hvm-*" --query 'Images[*].[Name, ImageId]'
+
+resource "aws_route53_delegation_set" "main" {
+  reference_name = "1047874"
+}
+
+resource "aws_route53_zone" "primary" {
+  name              = "datameta.app."
+  delegation_set_id = aws_route53_delegation_set.main.id
+}
+
+output "caller-reference" {
+  value = aws_route53_delegation_set.main.name_servers
+}
+
+output "delegation-setid" {
+  value = aws_route53_delegation_set.main.id
+}
