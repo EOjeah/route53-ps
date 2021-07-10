@@ -165,7 +165,7 @@ resource "aws_security_group" "east-sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["1.2.3.4/32"]
+    cidr_blocks = [""]
   }
 
   egress {
@@ -225,6 +225,10 @@ resource "aws_instance" "web1-east" {
   subnet_id                   = aws_subnet.east-1a.id
   key_name                    = "chukky"
   associate_public_ip_address = "true"
+  user_data                   = <<-EOT
+    #! /bin/bash
+    sudo docker run --rm -p 80:80 benpiper/r53-ec2-web
+  EOT
   tags = {
     Name = "web1-east"
   }
@@ -239,6 +243,10 @@ resource "aws_instance" "web2-east" {
   subnet_id                   = aws_subnet.east-1b.id
   key_name                    = "chukky"
   associate_public_ip_address = "true"
+  user_data                   = <<-EOT
+    #! /bin/bash
+    sudo docker run --rm -p 80:80 benpiper/r53-ec2-web
+  EOT
   tags = {
     Name = "web2-east"
   }
@@ -267,6 +275,10 @@ resource "aws_instance" "web1-west" {
   subnet_id                   = aws_subnet.west-1a.id
   key_name                    = "west-chukky"
   associate_public_ip_address = "true"
+  user_data                   = <<-EOT
+    #! /bin/bash
+    sudo docker run --rm -p 80:80 benpiper/r53-ec2-web
+  EOT
   tags = {
     Name = "web1-west"
   }
@@ -281,9 +293,27 @@ resource "aws_instance" "web2-west" {
   subnet_id                   = aws_subnet.west-1c.id
   key_name                    = "west-chukky"
   associate_public_ip_address = "true"
+  user_data                   = <<-EOT
+    #! /bin/bash
+    sudo docker run --rm -p 80:80 benpiper/r53-ec2-web
+  EOT
   tags = {
     Name = "web2-west"
   }
+}
+
+output "west-1-public-ip" {
+  value = "http://${aws_instance.web1-west.public_ip}"
+}
+output "west-2-public-ip" {
+  value = "http://${aws_instance.web2-west.public_ip}"
+}
+
+output "east-1-public-ip" {
+  value = "http://${aws_instance.web1-east.public_ip}"
+}
+output "east-2-public-ip" {
+  value = "http://${aws_instance.web2-east.public_ip}"
 }
 
 # sample query on bash $ aws ec2 describe-images --region us-west-1 --filters "Name=name,Values=aws-elasticbeanstalk-amzn-2017.09.1.x86_64-ecs-hvm-*" --query 'Images[*].[Name, ImageId]'
