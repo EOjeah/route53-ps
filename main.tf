@@ -475,8 +475,8 @@ resource "aws_route53_record" "www-seconday" {
   type           = "A"
   set_identifier = "www-secondary"
   alias {
-    name                   = aws_route53_record.west-primary.name
-    zone_id                = aws_route53_zone.primary.id
+    name                   = aws_s3_bucket.website-s3.website_domain
+    zone_id                = aws_s3_bucket.website-s3.hosted_zone_id
     evaluate_target_health = true
   }
 
@@ -551,6 +551,28 @@ resource "aws_route53_record" "west-secondary" {
   failover_routing_policy {
     type = "SECONDARY"
   }
+}
+
+resource "aws_s3_bucket" "website-s3" {
+  provider = aws.west
+  bucket   = "www.emmanuelojeah.xyz"
+  acl      = "public-read"
+
+  versioning {
+    enabled = false
+  }
+  website {
+    index_document = "index.html"
+  }
+}
+
+resource "aws_s3_bucket_object" "index-file" {
+  provider     = aws.west
+  bucket       = aws_s3_bucket.website-s3.id
+  key          = "index.html"
+  content      = file("index.html")
+  acl          = "public-read"
+  content_type = "text/html"
 }
 
 output "caller-reference" {
