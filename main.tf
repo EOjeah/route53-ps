@@ -335,6 +335,14 @@ resource "aws_route53_record" "web1-east" {
   records = [aws_instance.web1-east.public_ip]
 }
 
+resource "aws_route53_record" "www" {
+  zone_id = aws_route53_zone.primary.zone_id
+  name    = "www"
+  type    = "CNAME"
+  ttl     = "5"
+  records = [aws_route53_record.web1-east.name]
+}
+
 output "caller-reference" {
   value = aws_route53_delegation_set.main.name_servers
 }
