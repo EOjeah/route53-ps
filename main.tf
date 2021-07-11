@@ -10,6 +10,10 @@ provider "aws" {
   region = "us-west-1"
 }
 
+data "http" "myip" {
+  url = "http://ipv4.icanhazip.com"
+}
+
 resource "aws_vpc" "east-vpc" {
   provider             = aws.east
   cidr_block           = "172.3.0.0/16"
@@ -165,7 +169,7 @@ resource "aws_security_group" "east-sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = [""]
+    cidr_blocks = ["${chomp(data.http.myip.body)}/32"]
   }
 
   egress {
@@ -200,7 +204,7 @@ resource "aws_security_group" "west-sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["82.23.31.222/32"]
+    cidr_blocks = ["${chomp(data.http.myip.body)}/32"]
   }
 
   egress {
