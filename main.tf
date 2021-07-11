@@ -343,6 +343,17 @@ resource "aws_route53_record" "www" {
   records = [aws_route53_record.web1-east.name]
 }
 
+resource "aws_route53_record" "apex" {
+  zone_id = aws_route53_zone.primary.zone_id
+  name    = ""
+  type    = "A"
+  alias {
+    name                   = aws_route53_record.web1-east.name
+    zone_id                = aws_route53_zone.primary.id
+    evaluate_target_health = true
+  }
+}
+
 output "caller-reference" {
   value = aws_route53_delegation_set.main.name_servers
 }
