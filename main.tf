@@ -323,8 +323,16 @@ resource "aws_route53_delegation_set" "main" {
 }
 
 resource "aws_route53_zone" "primary" {
-  name              = "datameta.app."
+  name              = "emmanuelojeah.xyz."
   delegation_set_id = aws_route53_delegation_set.main.id
+}
+
+resource "aws_route53_record" "web1-east" {
+  zone_id = aws_route53_zone.primary.zone_id
+  name    = "web1-east.emmanuelojeah.xyz"
+  type    = "A"
+  ttl     = "60"
+  records = [aws_instance.web1-east.public_ip]
 }
 
 output "caller-reference" {
