@@ -343,27 +343,38 @@ resource "aws_route53_record" "web2-east" {
   records = [aws_instance.web2-east.public_ip]
 }
 
-resource "aws_route53_record" "www" {
-  zone_id = aws_route53_zone.primary.zone_id
-  name    = "www.emmanuelojeah.xyz"
-  type    = "A"
-  alias {
-    name                   = aws_route53_record.web2-east.name
-    zone_id                = aws_route53_zone.primary.id
-    evaluate_target_health = true
-  }
-}
+# resource "aws_route53_record" "www" {
+#   zone_id = aws_route53_zone.primary.zone_id
+#   name    = "www.emmanuelojeah.xyz"
+#   type    = "A"
+#   alias {
+#     name                   = aws_route53_record.web2-east.name
+#     zone_id                = aws_route53_zone.primary.id
+#     evaluate_target_health = true
+#   }
+# }
 
-resource "aws_route53_record" "apex" {
-  zone_id = aws_route53_zone.primary.zone_id
-  name    = ""
-  type    = "A"
-  alias {
-    name                   = aws_route53_record.www.name
-    zone_id                = aws_route53_zone.primary.id
-    evaluate_target_health = true
-  }
-}
+# resource "aws_route53_record" "apex" {
+#   zone_id = aws_route53_zone.primary.zone_id
+#   name    = ""
+#   type    = "A"
+#   alias {
+#     name                   = aws_route53_record.www.name
+#     zone_id                = aws_route53_zone.primary.id
+#     evaluate_target_health = true
+#   }
+# }
+
+# resource "aws_route53_record" "star" {
+#   zone_id = aws_route53_zone.primary.zone_id
+#   name    = "*"
+#   type    = "A"
+#   alias {
+#     name                   = aws_route53_record.www.name
+#     zone_id                = aws_route53_zone.primary.id
+#     evaluate_target_health = true
+#   }
+# }
 
 output "caller-reference" {
   value = aws_route53_delegation_set.main.name_servers
