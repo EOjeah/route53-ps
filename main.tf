@@ -380,6 +380,34 @@ resource "aws_route53_record" "web2-east" {
 #   }
 # }
 
+resource "aws_route53_health_check" "web1-healthcheck" {
+  ip_address        = aws_instance.web1-east.public_ip
+  port              = 80
+  type              = "HTTP"
+  resource_path     = "/"
+  failure_threshold = "2"
+  request_interval  = "30"
+
+  regions = ["us-east-1", "us-west-1", "us-west-2"]
+  tags = {
+    Name = "web1-east-health-check"
+  }
+}
+
+resource "aws_route53_health_check" "web2-healthcheck" {
+  ip_address        = aws_instance.web2-east.public_ip
+  port              = 80
+  type              = "HTTP"
+  resource_path     = "/"
+  failure_threshold = "2"
+  request_interval  = "30"
+
+  regions = ["us-east-1", "us-west-1", "us-west-2"]
+  tags = {
+    Name = "web2-east-health-check"
+  }
+}
+
 output "caller-reference" {
   value = aws_route53_delegation_set.main.name_servers
 }
