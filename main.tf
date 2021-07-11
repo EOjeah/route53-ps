@@ -335,12 +335,23 @@ resource "aws_route53_record" "web1-east" {
   records = [aws_instance.web1-east.public_ip]
 }
 
+resource "aws_route53_record" "web2-east" {
+  zone_id = aws_route53_zone.primary.zone_id
+  name    = "web2-east.emmanuelojeah.xyz"
+  type    = "A"
+  ttl     = "60"
+  records = [aws_instance.web2-east.public_ip]
+}
+
 resource "aws_route53_record" "www" {
   zone_id = aws_route53_zone.primary.zone_id
-  name    = "www"
-  type    = "CNAME"
-  ttl     = "5"
-  records = [aws_route53_record.web1-east.name]
+  name    = "www.emmanuelojeah.xyz"
+  type    = "A"
+  alias {
+    name                   = aws_route53_record.web2-east.name
+    zone_id                = aws_route53_zone.primary.id
+    evaluate_target_health = true
+  }
 }
 
 resource "aws_route53_record" "apex" {
@@ -348,7 +359,7 @@ resource "aws_route53_record" "apex" {
   name    = ""
   type    = "A"
   alias {
-    name                   = aws_route53_record.web1-east.name
+    name                   = aws_route53_record.www.name
     zone_id                = aws_route53_zone.primary.id
     evaluate_target_health = true
   }
