@@ -3,8 +3,6 @@ provider "aws" {
   alias  = "east"
 }
 
-# Additional provider configuration for west coast region; resources can
-# reference this as `aws.west`.
 provider "aws" {
   alias  = "west"
   region = "us-west-1"
@@ -329,7 +327,7 @@ resource "aws_route53_zone" "primary" {
 }
 
 data "aws_route53_delegation_set" "main" {
-  id = "N01183162IKVAVWFA9MD1"
+  id = "N0193805L3AX0CH0SN8B"
 }
 
 resource "aws_route53_record" "web1-east" {
@@ -420,11 +418,11 @@ resource "aws_route53_health_check" "web2-west-healthcheck" {
   }
 }
 
-resource "aws_route53_record" "www-east-1" {
+resource "aws_route53_record" "weighted-web1-east" {
   zone_id         = aws_route53_zone.primary.zone_id
-  name            = "www.emmanuelojeah.xyz"
+  name            = "weighted-web1.emmanuelojeah.xyz"
   type            = "A"
-  set_identifier  = "www-east-1"
+  set_identifier  = "weighted-web-east-1"
   health_check_id = aws_route53_health_check.web1-east-healthcheck.id
 
   alias {
@@ -438,11 +436,11 @@ resource "aws_route53_record" "www-east-1" {
   }
 }
 
-resource "aws_route53_record" "www-east-2" {
+resource "aws_route53_record" "weighted-web2-east" {
   zone_id         = aws_route53_zone.primary.zone_id
-  name            = "www.emmanuelojeah.xyz"
+  name            = "weighted-web2.emmanuelojeah.xyz"
   type            = "A"
-  set_identifier  = "www-east-2"
+  set_identifier  = "weighted-web-east-2"
   health_check_id = aws_route53_health_check.web2-east-healthcheck.id
 
   alias {
@@ -456,11 +454,11 @@ resource "aws_route53_record" "www-east-2" {
   }
 }
 
-resource "aws_route53_record" "www-west-1" {
+resource "aws_route53_record" "weighted-web1-west" {
   zone_id         = aws_route53_zone.primary.zone_id
-  name            = "www.emmanuelojeah.xyz"
+  name            = "weighted-web1.emmanuelojeah.xyz"
   type            = "A"
-  set_identifier  = "www-west-1"
+  set_identifier  = "weighted-web-west-1"
   health_check_id = aws_route53_health_check.web1-west-healthcheck.id
 
   alias {
@@ -474,11 +472,11 @@ resource "aws_route53_record" "www-west-1" {
   }
 }
 
-resource "aws_route53_record" "www-west-2" {
+resource "aws_route53_record" "weighted-web2-west" {
   zone_id         = aws_route53_zone.primary.zone_id
-  name            = "www.emmanuelojeah.xyz"
+  name            = "weighted-web2.emmanuelojeah.xyz"
   type            = "A"
-  set_identifier  = "www-west-2"
+  set_identifier  = "weighted-web-west-2"
   health_check_id = aws_route53_health_check.web2-west-healthcheck.id
 
   alias {
@@ -492,32 +490,16 @@ resource "aws_route53_record" "www-west-2" {
   }
 }
 
-# resource "aws_route53_record" "www-seconday" {
-#   zone_id        = aws_route53_zone.primary.zone_id
-#   name           = "www.emmanuelojeah.xyz"
-#   type           = "A"
-#   set_identifier = "www-secondary"
-#   alias {
-#     name                   = aws_s3_bucket.website-s3.website_domain
-#     zone_id                = aws_s3_bucket.website-s3.hosted_zone_id
-#     evaluate_target_health = true
-#   }
+resource "aws_route53_record" "www-primary" {
+  zone_id        = aws_route53_zone.primary.zone_id
+  name           = "www.emmanuelojeah.xyz"
+  type           = "A"
+  set_identifier = "www-primary"
 
-#   failover_routing_policy {
-#     type = "SECONDARY"
-#   }
-# }
-
-resource "aws_route53_record" "east-primary" {
-  zone_id         = aws_route53_zone.primary.zone_id
-  name            = "east.emmanuelojeah.xyz"
-  type            = "A"
-  health_check_id = aws_route53_health_check.web1-east-healthcheck.id
-  set_identifier  = "east-primary"
   alias {
-    name                   = aws_route53_record.web1-east.name
+    name                   = aws_route53_record.weighted-web1-east.name
     zone_id                = aws_route53_zone.primary.id
-    evaluate_target_health = false
+    evaluate_target_health = true
   }
 
   failover_routing_policy {
@@ -525,16 +507,16 @@ resource "aws_route53_record" "east-primary" {
   }
 }
 
-resource "aws_route53_record" "east-secondary" {
-  zone_id         = aws_route53_zone.primary.zone_id
-  name            = "east.emmanuelojeah.xyz"
-  type            = "A"
-  health_check_id = aws_route53_health_check.web2-east-healthcheck.id
-  set_identifier  = "east-secondary"
+resource "aws_route53_record" "www-secondary" {
+  zone_id        = aws_route53_zone.primary.zone_id
+  name           = "www.emmanuelojeah.xyz"
+  type           = "A"
+  set_identifier = "www-secondary"
+
   alias {
-    name                   = aws_route53_record.web2-east.name
+    name                   = aws_route53_record.weighted-web2-east.name
     zone_id                = aws_route53_zone.primary.id
-    evaluate_target_health = false
+    evaluate_target_health = true
   }
 
   failover_routing_policy {
@@ -599,9 +581,9 @@ resource "aws_s3_bucket_object" "index-file" {
 }
 
 output "caller-reference" {
-  value = aws_route53_delegation_set.main.name_servers
+  value = data.aws_route53_delegation_set.main.name_servers
 }
 
 output "delegation-setid" {
-  value = aws_route53_delegation_set.main.id
+  value = data.aws_route53_delegation_set.main.id
 }
