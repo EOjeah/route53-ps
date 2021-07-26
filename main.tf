@@ -364,39 +364,6 @@ resource "aws_route53_record" "web2-west" {
   records = [aws_instance.web2-west.public_ip]
 }
 
-# resource "aws_route53_record" "www" {
-#   zone_id = aws_route53_zone.primary.zone_id
-#   name    = "www.emmanuelojeah.xyz"
-#   type    = "A"
-#   alias {
-#     name                   = aws_route53_record.web2-east.name
-#     zone_id                = aws_route53_zone.primary.id
-#     evaluate_target_health = true
-#   }
-# }
-
-# resource "aws_route53_record" "apex" {
-#   zone_id = aws_route53_zone.primary.zone_id
-#   name    = ""
-#   type    = "A"
-#   alias {
-#     name                   = aws_route53_record.www.name
-#     zone_id                = aws_route53_zone.primary.id
-#     evaluate_target_health = true
-#   }
-# }
-
-# resource "aws_route53_record" "star" {
-#   zone_id = aws_route53_zone.primary.zone_id
-#   name    = "*"
-#   type    = "A"
-#   alias {
-#     name                   = aws_route53_record.www.name
-#     zone_id                = aws_route53_zone.primary.id
-#     evaluate_target_health = true
-#   }
-# }
-
 resource "aws_route53_health_check" "web1-east-healthcheck" {
   ip_address        = aws_instance.web1-east.public_ip
   port              = 80
@@ -453,37 +420,93 @@ resource "aws_route53_health_check" "web2-west-healthcheck" {
   }
 }
 
-resource "aws_route53_record" "www-primary" {
-  zone_id        = aws_route53_zone.primary.zone_id
-  name           = "www.emmanuelojeah.xyz"
-  type           = "A"
-  set_identifier = "www-primary"
+resource "aws_route53_record" "www-east-1" {
+  zone_id         = aws_route53_zone.primary.zone_id
+  name            = "www.emmanuelojeah.xyz"
+  type            = "A"
+  set_identifier  = "www-east-1"
+  health_check_id = aws_route53_health_check.web1-east-healthcheck.id
+
   alias {
-    name                   = aws_route53_record.east-primary.name
+    name                   = aws_route53_record.web1-east.name
     zone_id                = aws_route53_zone.primary.id
-    evaluate_target_health = true
+    evaluate_target_health = false
   }
 
-  failover_routing_policy {
-    type = "PRIMARY"
+  weighted_routing_policy {
+    weight = 25
   }
 }
 
-resource "aws_route53_record" "www-seconday" {
-  zone_id        = aws_route53_zone.primary.zone_id
-  name           = "www.emmanuelojeah.xyz"
-  type           = "A"
-  set_identifier = "www-secondary"
+resource "aws_route53_record" "www-east-2" {
+  zone_id         = aws_route53_zone.primary.zone_id
+  name            = "www.emmanuelojeah.xyz"
+  type            = "A"
+  set_identifier  = "www-east-2"
+  health_check_id = aws_route53_health_check.web2-east-healthcheck.id
+
   alias {
-    name                   = aws_s3_bucket.website-s3.website_domain
-    zone_id                = aws_s3_bucket.website-s3.hosted_zone_id
-    evaluate_target_health = true
+    name                   = aws_route53_record.web2-east.name
+    zone_id                = aws_route53_zone.primary.id
+    evaluate_target_health = false
   }
 
-  failover_routing_policy {
-    type = "SECONDARY"
+  weighted_routing_policy {
+    weight = 25
   }
 }
+
+resource "aws_route53_record" "www-west-1" {
+  zone_id         = aws_route53_zone.primary.zone_id
+  name            = "www.emmanuelojeah.xyz"
+  type            = "A"
+  set_identifier  = "www-west-1"
+  health_check_id = aws_route53_health_check.web1-west-healthcheck.id
+
+  alias {
+    name                   = aws_route53_record.web1-west.name
+    zone_id                = aws_route53_zone.primary.id
+    evaluate_target_health = false
+  }
+
+  weighted_routing_policy {
+    weight = 25
+  }
+}
+
+resource "aws_route53_record" "www-west-2" {
+  zone_id         = aws_route53_zone.primary.zone_id
+  name            = "www.emmanuelojeah.xyz"
+  type            = "A"
+  set_identifier  = "www-west-2"
+  health_check_id = aws_route53_health_check.web2-west-healthcheck.id
+
+  alias {
+    name                   = aws_route53_record.web2-west.name
+    zone_id                = aws_route53_zone.primary.id
+    evaluate_target_health = false
+  }
+
+  weighted_routing_policy {
+    weight = 25
+  }
+}
+
+# resource "aws_route53_record" "www-seconday" {
+#   zone_id        = aws_route53_zone.primary.zone_id
+#   name           = "www.emmanuelojeah.xyz"
+#   type           = "A"
+#   set_identifier = "www-secondary"
+#   alias {
+#     name                   = aws_s3_bucket.website-s3.website_domain
+#     zone_id                = aws_s3_bucket.website-s3.hosted_zone_id
+#     evaluate_target_health = true
+#   }
+
+#   failover_routing_policy {
+#     type = "SECONDARY"
+#   }
+# }
 
 resource "aws_route53_record" "east-primary" {
   zone_id         = aws_route53_zone.primary.zone_id
