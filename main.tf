@@ -490,56 +490,37 @@ resource "aws_route53_record" "weighted-web2-west" {
   }
 }
 
-resource "aws_route53_record" "www-default" {
+resource "aws_route53_record" "www-east-latency" {
   zone_id         = aws_route53_zone.primary.zone_id
   name            = "www.emmanuelojeah.xyz"
   type            = "A"
-  set_identifier  = "www-default"
-  health_check_id = aws_route53_health_check.web2-west-healthcheck.id
-
-  geolocation_routing_policy {
-    country = "*"
-  }
-
-  alias {
-    name                   = aws_route53_record.weighted-web2-west.name
-    zone_id                = aws_route53_zone.primary.id
-    evaluate_target_health = false
-  }
-}
-
-resource "aws_route53_record" "www-usa" {
-  zone_id         = aws_route53_zone.primary.zone_id
-  name            = "www.emmanuelojeah.xyz"
-  type            = "A"
-  set_identifier  = "www-usa"
-  health_check_id = aws_route53_health_check.web1-west-healthcheck.id
-
-  geolocation_routing_policy {
-    country = "US"
-  }
-
-  alias {
-    name                   = aws_route53_record.weighted-web1-west.name
-    zone_id                = aws_route53_zone.primary.id
-    evaluate_target_health = false
-  }
-}
-
-resource "aws_route53_record" "www-usa-sc" {
-  zone_id         = aws_route53_zone.primary.zone_id
-  name            = "www.emmanuelojeah.xyz"
-  type            = "A"
-  set_identifier  = "www-usa-sc"
+  set_identifier  = "www-nv"
   health_check_id = aws_route53_health_check.web1-east-healthcheck.id
 
-  geolocation_routing_policy {
-    country     = "US"
-    subdivision = "SC"
+  latency_routing_policy {
+    region = "us-east-1"
   }
 
   alias {
-    name                   = aws_route53_record.weighted-web1-east.name
+    name                   = aws_route53_record.web1-east.name
+    zone_id                = aws_route53_zone.primary.id
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_route53_record" "www-west-latency" {
+  zone_id         = aws_route53_zone.primary.zone_id
+  name            = "www.emmanuelojeah.xyz"
+  type            = "A"
+  set_identifier  = "www-ca"
+  health_check_id = aws_route53_health_check.web1-west-healthcheck.id
+
+  latency_routing_policy {
+    region = "us-west-1"
+  }
+
+  alias {
+    name                   = aws_route53_record.web1-west.name
     zone_id                = aws_route53_zone.primary.id
     evaluate_target_health = false
   }
