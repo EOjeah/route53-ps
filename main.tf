@@ -490,37 +490,58 @@ resource "aws_route53_record" "weighted-web2-west" {
   }
 }
 
-resource "aws_route53_record" "www-primary" {
-  zone_id        = aws_route53_zone.primary.zone_id
-  name           = "www.emmanuelojeah.xyz"
-  type           = "A"
-  set_identifier = "www-primary"
+resource "aws_route53_record" "www-default" {
+  zone_id         = aws_route53_zone.primary.zone_id
+  name            = "www.emmanuelojeah.xyz"
+  type            = "A"
+  set_identifier  = "www-default"
+  health_check_id = aws_route53_health_check.web2-west-healthcheck.id
+
+  geolocation_routing_policy {
+    country = "*"
+  }
+
+  alias {
+    name                   = aws_route53_record.weighted-web2-west.name
+    zone_id                = aws_route53_zone.primary.id
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_route53_record" "www-usa" {
+  zone_id         = aws_route53_zone.primary.zone_id
+  name            = "www.emmanuelojeah.xyz"
+  type            = "A"
+  set_identifier  = "www-usa"
+  health_check_id = aws_route53_health_check.web1-west-healthcheck.id
+
+  geolocation_routing_policy {
+    country = "US"
+  }
+
+  alias {
+    name                   = aws_route53_record.weighted-web1-west.name
+    zone_id                = aws_route53_zone.primary.id
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_route53_record" "www-usa-sc" {
+  zone_id         = aws_route53_zone.primary.zone_id
+  name            = "www.emmanuelojeah.xyz"
+  type            = "A"
+  set_identifier  = "www-usa-sc"
+  health_check_id = aws_route53_health_check.web1-east-healthcheck.id
+
+  geolocation_routing_policy {
+    country     = "US"
+    subdivision = "SC"
+  }
 
   alias {
     name                   = aws_route53_record.weighted-web1-east.name
     zone_id                = aws_route53_zone.primary.id
-    evaluate_target_health = true
-  }
-
-  failover_routing_policy {
-    type = "PRIMARY"
-  }
-}
-
-resource "aws_route53_record" "www-secondary" {
-  zone_id        = aws_route53_zone.primary.zone_id
-  name           = "www.emmanuelojeah.xyz"
-  type           = "A"
-  set_identifier = "www-secondary"
-
-  alias {
-    name                   = aws_route53_record.weighted-web2-east.name
-    zone_id                = aws_route53_zone.primary.id
-    evaluate_target_health = true
-  }
-
-  failover_routing_policy {
-    type = "SECONDARY"
+    evaluate_target_health = false
   }
 }
 
