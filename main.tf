@@ -434,7 +434,7 @@ resource "aws_route53_record" "www-east-1" {
   }
 
   weighted_routing_policy {
-    weight = 25
+    weight = 10
   }
 }
 
@@ -452,7 +452,7 @@ resource "aws_route53_record" "www-east-2" {
   }
 
   weighted_routing_policy {
-    weight = 25
+    weight = 10
   }
 }
 
@@ -470,7 +470,7 @@ resource "aws_route53_record" "www-west-1" {
   }
 
   weighted_routing_policy {
-    weight = 25
+    weight = 20
   }
 }
 
@@ -488,7 +488,7 @@ resource "aws_route53_record" "www-west-2" {
   }
 
   weighted_routing_policy {
-    weight = 25
+    weight = 20
   }
 }
 
