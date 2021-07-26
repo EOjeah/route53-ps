@@ -336,7 +336,7 @@ resource "aws_route53_record" "web1-east" {
   zone_id = aws_route53_zone.primary.zone_id
   name    = "web1-east.emmanuelojeah.xyz"
   type    = "A"
-  ttl     = "60"
+  ttl     = "30"
   records = [aws_instance.web1-east.public_ip]
 }
 
@@ -344,7 +344,7 @@ resource "aws_route53_record" "web2-east" {
   zone_id = aws_route53_zone.primary.zone_id
   name    = "web2-east.emmanuelojeah.xyz"
   type    = "A"
-  ttl     = "60"
+  ttl     = "30"
   records = [aws_instance.web2-east.public_ip]
 }
 
@@ -352,7 +352,7 @@ resource "aws_route53_record" "web1-west" {
   zone_id = aws_route53_zone.primary.zone_id
   name    = "web1-west.emmanuelojeah.xyz"
   type    = "A"
-  ttl     = "60"
+  ttl     = "30"
   records = [aws_instance.web1-west.public_ip]
 }
 
@@ -360,7 +360,7 @@ resource "aws_route53_record" "web2-west" {
   zone_id = aws_route53_zone.primary.zone_id
   name    = "web2-west.emmanuelojeah.xyz"
   type    = "A"
-  ttl     = "60"
+  ttl     = "30"
   records = [aws_instance.web2-west.public_ip]
 }
 
