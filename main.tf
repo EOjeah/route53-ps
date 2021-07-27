@@ -418,146 +418,56 @@ resource "aws_route53_health_check" "web2-west-healthcheck" {
   }
 }
 
-resource "aws_route53_record" "weighted-web1-east" {
-  zone_id         = aws_route53_zone.primary.zone_id
-  name            = "weighted-web1.emmanuelojeah.xyz"
-  type            = "A"
-  set_identifier  = "weighted-web-east-1"
-  health_check_id = aws_route53_health_check.web1-east-healthcheck.id
-
-  alias {
-    name                   = aws_route53_record.web1-east.name
-    zone_id                = aws_route53_zone.primary.id
-    evaluate_target_health = false
-  }
-
-  weighted_routing_policy {
-    weight = 10
-  }
+resource "aws_route53_record" "www-1e" {
+  zone_id                          = aws_route53_zone.primary.zone_id
+  name                             = "www.emmanuelojeah.xyz"
+  type                             = "A"
+  ttl                              = "60"
+  records                          = [aws_instance.web1-east.public_ip]
+  health_check_id                  = aws_route53_health_check.web1-east-healthcheck.id
+  multivalue_answer_routing_policy = true
+  set_identifier                   = "web1-east"
 }
 
-resource "aws_route53_record" "weighted-web2-east" {
-  zone_id         = aws_route53_zone.primary.zone_id
-  name            = "weighted-web2.emmanuelojeah.xyz"
-  type            = "A"
-  set_identifier  = "weighted-web-east-2"
-  health_check_id = aws_route53_health_check.web2-east-healthcheck.id
-
-  alias {
-    name                   = aws_route53_record.web2-east.name
-    zone_id                = aws_route53_zone.primary.id
-    evaluate_target_health = false
-  }
-
-  weighted_routing_policy {
-    weight = 10
-  }
+resource "aws_route53_record" "www-2e" {
+  zone_id                          = aws_route53_zone.primary.zone_id
+  name                             = "www.emmanuelojeah.xyz"
+  type                             = "A"
+  ttl                              = "60"
+  records                          = [aws_instance.web2-east.public_ip]
+  health_check_id                  = aws_route53_health_check.web2-east-healthcheck.id
+  multivalue_answer_routing_policy = true
+  set_identifier                   = "web2-east"
 }
 
-resource "aws_route53_record" "weighted-web1-west" {
-  zone_id         = aws_route53_zone.primary.zone_id
-  name            = "weighted-web1.emmanuelojeah.xyz"
-  type            = "A"
-  set_identifier  = "weighted-web-west-1"
-  health_check_id = aws_route53_health_check.web1-west-healthcheck.id
-
-  alias {
-    name                   = aws_route53_record.web1-west.name
-    zone_id                = aws_route53_zone.primary.id
-    evaluate_target_health = false
-  }
-
-  weighted_routing_policy {
-    weight = 20
-  }
+resource "aws_route53_record" "www-1w" {
+  zone_id                          = aws_route53_zone.primary.zone_id
+  name                             = "www.emmanuelojeah.xyz"
+  type                             = "A"
+  ttl                              = "60"
+  records                          = [aws_instance.web1-west.public_ip]
+  health_check_id                  = aws_route53_health_check.web1-west-healthcheck.id
+  multivalue_answer_routing_policy = true
+  set_identifier                   = "web1-west"
 }
 
-resource "aws_route53_record" "weighted-web2-west" {
-  zone_id         = aws_route53_zone.primary.zone_id
-  name            = "weighted-web2.emmanuelojeah.xyz"
-  type            = "A"
-  set_identifier  = "weighted-web-west-2"
-  health_check_id = aws_route53_health_check.web2-west-healthcheck.id
-
-  alias {
-    name                   = aws_route53_record.web2-west.name
-    zone_id                = aws_route53_zone.primary.id
-    evaluate_target_health = false
-  }
-
-  weighted_routing_policy {
-    weight = 20
-  }
+resource "aws_route53_record" "www-2w" {
+  zone_id                          = aws_route53_zone.primary.zone_id
+  name                             = "www.emmanuelojeah.xyz"
+  type                             = "A"
+  ttl                              = "60"
+  records                          = [aws_instance.web2-west.public_ip]
+  health_check_id                  = aws_route53_health_check.web2-west-healthcheck.id
+  multivalue_answer_routing_policy = true
+  set_identifier                   = "web2-west"
 }
 
-resource "aws_route53_record" "www-east-latency" {
-  zone_id         = aws_route53_zone.primary.zone_id
-  name            = "www.emmanuelojeah.xyz"
-  type            = "A"
-  set_identifier  = "www-nv"
-  health_check_id = aws_route53_health_check.web1-east-healthcheck.id
-
-  latency_routing_policy {
-    region = "us-east-1"
-  }
-
-  alias {
-    name                   = aws_route53_record.web1-east.name
-    zone_id                = aws_route53_zone.primary.id
-    evaluate_target_health = false
-  }
-}
-
-resource "aws_route53_record" "www-west-latency" {
-  zone_id         = aws_route53_zone.primary.zone_id
-  name            = "www.emmanuelojeah.xyz"
-  type            = "A"
-  set_identifier  = "www-ca"
-  health_check_id = aws_route53_health_check.web1-west-healthcheck.id
-
-  latency_routing_policy {
-    region = "us-west-1"
-  }
-
-  alias {
-    name                   = aws_route53_record.web1-west.name
-    zone_id                = aws_route53_zone.primary.id
-    evaluate_target_health = false
-  }
-}
-
-resource "aws_route53_record" "west-primary" {
-  zone_id         = aws_route53_zone.primary.zone_id
-  name            = "west.emmanuelojeah.xyz"
-  type            = "A"
-  health_check_id = aws_route53_health_check.web1-west-healthcheck.id
-  set_identifier  = "west-primary"
-  alias {
-    name                   = aws_route53_record.web1-west.name
-    zone_id                = aws_route53_zone.primary.id
-    evaluate_target_health = false
-  }
-
-  failover_routing_policy {
-    type = "PRIMARY"
-  }
-}
-
-resource "aws_route53_record" "west-secondary" {
-  zone_id         = aws_route53_zone.primary.zone_id
-  name            = "west.emmanuelojeah.xyz"
-  type            = "A"
-  health_check_id = aws_route53_health_check.web2-west-healthcheck.id
-  set_identifier  = "west-secondary"
-  alias {
-    name                   = aws_route53_record.web2-west.name
-    zone_id                = aws_route53_zone.primary.id
-    evaluate_target_health = false
-  }
-
-  failover_routing_policy {
-    type = "SECONDARY"
-  }
+resource "aws_route53_record" "simple" {
+  zone_id = aws_route53_zone.primary.zone_id
+  name    = "simple.emmanuelojeah.xyz"
+  type    = "A"
+  ttl     = "30"
+  records = [aws_instance.web1-east.public_ip, aws_instance.web2-east.public_ip, aws_instance.web1-west.public_ip, aws_instance.web2-west.public_ip]
 }
 
 resource "aws_s3_bucket" "website-s3" {
