@@ -170,6 +170,14 @@ resource "aws_security_group" "east-sg" {
     cidr_blocks = ["${chomp(data.http.myip.body)}/32"]
   }
 
+  ingress {
+    description = "TCP connection locally"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    self        = true
+  }
+
   egress {
     from_port        = 0
     to_port          = 0
