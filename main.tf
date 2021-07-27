@@ -516,7 +516,10 @@ resource "aws_route53_zone" "private" {
     vpc_id     = aws_vpc.east-vpc.id
     vpc_region = "us-east-1"
   }
-
+  vpc {
+    vpc_id     = aws_vpc.west-vpc.id
+    vpc_region = "us-west-1"
+  }
 }
 
 resource "aws_route53_record" "db" {
