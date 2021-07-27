@@ -287,7 +287,7 @@ resource "aws_instance" "web1-west" {
   associate_public_ip_address = "true"
   user_data                   = <<-EOT
     #! /bin/bash
-    sudo docker run --rm -p 80:80 benpiper/r53-ec2-web
+    sudo docker run --rm -p 80:80 -e DBHOSTNAME=db.emmanuelojeah.xyz benpiper/r53-ec2-web
   EOT
   tags = {
     Name = "web1-west"
