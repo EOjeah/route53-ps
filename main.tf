@@ -237,7 +237,7 @@ resource "aws_instance" "web1-east" {
   associate_public_ip_address = "true"
   user_data                   = <<-EOT
     #! /bin/bash
-    sudo docker run --rm -p 80:80 benpiper/r53-ec2-web
+    sudo docker run --rm -p 80:80 -e DBHOSTNAME=db.emmanuelojeah.xyz benpiper/r53-ec2-web
   EOT
   tags = {
     Name = "web1-east"
@@ -506,4 +506,23 @@ output "caller-reference" {
 
 output "delegation-setid" {
   value = data.aws_route53_delegation_set.main.id
+}
+
+resource "aws_route53_zone" "private" {
+  name    = "emmanuelojeah.xyz."
+  comment = "private: east,west"
+
+  vpc {
+    vpc_id     = aws_vpc.east-vpc.id
+    vpc_region = "us-east-1"
+  }
+
+}
+
+resource "aws_route53_record" "db" {
+  zone_id = aws_route53_zone.private.zone_id
+  name    = "db.emmanuelojeah.xyz"
+  type    = "A"
+  ttl     = "300"
+  records = [aws_instance.db-east.private_ip]
 }
