@@ -28,7 +28,7 @@ Code follow along via git tags
 
 2. Create Resources!
 
-    Use the output from `step 1` above and replace this terraform resource in [main.tf](./main.tf#337-339) with the `delegation_set_id` output string
+    Use the output from `step 1` above and replace this terraform resource in [main.tf](https://github.com/EOjeah/route53-ps/blob/10.2/main.tf#L338) with the `delegation_set_id` output string
 
     ```js
     data "aws_route53_delegation_set" "main" {
